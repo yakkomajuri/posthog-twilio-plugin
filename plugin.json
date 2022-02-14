@@ -44,7 +44,7 @@
         "key": "timeout",
         "hint": "Tell us frequency of message. ",
         "name": "In how much time posthog should send message again (in seconds)?",
-        "type": "integer",
+        "type": "string",
         "default": "60",
         "required": true
       }
