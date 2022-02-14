@@ -54,18 +54,10 @@ async function fetchWithRetry(
 }
 
 async function sendMessageWithTwilio(eventName, config, global, cache) {
-  console.log(eventName);
-  console.log(global.eventAndNumberMap[eventName]);
   const number = global.eventAndNumberMap[eventName];
   if (await cache.get(`${eventName}-${number}`)) {
-    console.log(`${eventName}-${number} already sent`);
     return;
   } else {
-    // let urlencoded = new URLSearchParams();
-    // urlencoded.append("Body", `Hi, ${eventName} occured - PostHog`);
-    // urlencoded.append("From", `${config.senderPhoneNumber}`);
-    // urlencoded.append("To", `${number}`);
-
     const myheaders = global.defaultHeaders;
 
     myheaders.body =
@@ -83,7 +75,6 @@ async function sendMessageWithTwilio(eventName, config, global, cache) {
 
 export async function onEvent(event, { config, global, cache }) {
   if (!global.eventAndNumberMap[event.event]) {
-    console.log(`${event.event} not found in eventAndNumberMap`);
     return;
   } else {
     await sendMessageWithTwilio(event.event, config, global, cache);
