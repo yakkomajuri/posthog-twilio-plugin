@@ -1,0 +1,12 @@
+{
+    "name": "posthog-twilio-plugin",
+    "version": "0.0.1",
+    "description": "Send SMS from Twilio",
+    "main": "index.js",
+    "authors": "Sandeep Guptan & Himanshu Garg",
+    "license": "MIT",
+    "dependencies": {
+      "node-fetch": "^3.2.0"
+    }
+  }
+  
