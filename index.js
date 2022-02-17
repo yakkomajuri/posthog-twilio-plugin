@@ -30,7 +30,7 @@ export async function setupPlugin({ config, global }) {
     });
     global.eventAndNumberMap[val[0]] = val[1];
   }
-  console.log(global.eventAndNumberMap);
+  console.log(`Twillio setup successfully`);
 }
 
 async function fetchWithRetry(
@@ -63,6 +63,7 @@ export const jobs = {
     if (await cache.get(`${request.eventName}-${number}`, null)) {
       return;
     } else {
+      await cache.set(`${request.eventName}-${number}`, true, global.timeout);
       global.options.body =
         "Body=Hi, " +
         request.eventName +
@@ -72,7 +73,6 @@ export const jobs = {
         number;
 
       await fetchWithRetry(global.baseURL, global.options, "POST");
-      await cache.set(`${request.eventName}-${number}`, true, config.timeout);
     }
   },
 };
