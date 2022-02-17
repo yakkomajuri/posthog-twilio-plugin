@@ -1,4 +1,4 @@
-export async function setupPlugin({ config, global, cache }) {
+export async function setupPlugin({ config, global }) {
   console.info(`Setting up the plugin`);
 
   global.baseURL = `https://api.twilio.com/2010-04-01/Accounts/${config.accountSID}/Messages.json`;
@@ -7,12 +7,15 @@ export async function setupPlugin({ config, global, cache }) {
     `${config.accountSID}:${config.authToken}`
   ).toString("base64");
 
-  global.defaultHeaders = {
+  global.options = {
     headers: {
       Authorization: `Basic ${global.token}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
   };
+
+  global.senderPhoneNumber = config.senderPhoneNumber;
+  global.timeout = config.timeout;
 
   let pairs = (config.triggeringEventsAndNumber || "")
     .split(",")
@@ -53,30 +56,34 @@ async function fetchWithRetry(
   }
 }
 
-async function sendMessageWithTwilio(eventName, config, global, cache) {
-  const number = global.eventAndNumberMap[eventName];
-  if (await cache.get(`${eventName}-${number}`)) {
-    return;
-  } else {
-    const myheaders = global.defaultHeaders;
+export const jobs = {
+  sendMessageWithTwilio: async (request, { global, cache }) => {
+    const number = global.eventAndNumberMap[request.eventName];
 
-    myheaders.body =
-      "Body=Hi, " +
-      eventName +
-      " occured - PostHog&From=" +
-      config.senderPhoneNumber +
-      "&To=" +
-      number;
+    if (await cache.get(`${request.eventName}-${number}`, null)) {
+      return;
+    } else {
+      global.options.body =
+        "Body=Hi, " +
+        request.eventName +
+        " occured - PostHog&From=" +
+        global.senderPhoneNumber +
+        "&To=" +
+        number;
 
-    await fetchWithRetry(global.baseURL, myheaders, "POST");
-    await cache.set(`$(eventName}-${number}`, true, config.timeout);
-  }
-}
+      await fetchWithRetry(global.baseURL, global.options, "POST");
+      await cache.set(`${request.eventName}-${number}`, true, config.timeout);
+    }
+  },
+};
 
-export async function onEvent(event, { config, global, cache }) {
+export async function onEvent(event, { jobs, global }) {
   if (!global.eventAndNumberMap[event.event]) {
     return;
   } else {
-    await sendMessageWithTwilio(event.event, config, global, cache);
+    const request = {
+      eventName: event.event,
+    };
+    await jobs.sendMessageWithTwilio(request).runNow();
   }
 }
