@@ -7,5 +7,15 @@
     "license": "MIT",
     "dependencies": {
         "node-fetch": "^3.2.0"
+    },
+    "jest": {
+        "testEnvironment": "node"
+    },
+    "scripts": {
+        "test": "jest ."
+    },
+    "devDependencies": {
+        "@posthog/plugin-scaffold": "0.10.0",
+        "jest": "^27.0.4"
     }
 }

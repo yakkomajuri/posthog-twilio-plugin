@@ -1,4 +1,4 @@
-export async function setupPlugin({ config, global }) {
+async function setupPlugin({ config, global }) {
     console.info(`Setting up the plugin`)
 
     global.baseURL = `https://api.twilio.com/2010-04-01/Accounts/${config.accountSID}/Messages.json`
@@ -13,7 +13,12 @@ export async function setupPlugin({ config, global }) {
     }
 
     global.senderPhoneNumber = config.senderPhoneNumber
-    global.timeout = config.timeout
+    if (config.timeout <= 0 || config.timeout > 365 * 60 * 60 * 24) {
+        console.error(`timeout is not supported`)
+        return 'timeout is not supported'
+    } else {
+        global.timeout = config.timeout
+    }
 
     let pairs = (config.triggeringEventsAndNumber || '').split(',').map(function (value) {
         return value.trim()
@@ -27,6 +32,7 @@ export async function setupPlugin({ config, global }) {
         global.eventAndNumberMap[val[0]] = val[1]
     }
     console.log(`Twillio setup successfully`)
+    return 'Twillio setup successfully'
 }
 
 async function fetchWithRetry(url, options = {}, method = 'GET', isRetry = false) {
@@ -41,13 +47,14 @@ async function fetchWithRetry(url, options = {}, method = 'GET', isRetry = false
         return res
     }
 }
-
-export const jobs = {
+const jobs = {
     sendMessageWithTwilio: async (request, { global, cache }) => {
         const number = global.eventAndNumberMap[request.eventName]
-
-        if (await cache.get(`${request.eventName}-${number}`, null)) {
-            return
+        let response = null
+        const cacheValue = await cache.get(`${request.eventName}-${number}`, null)
+        console.log(cacheValue)
+        if (cacheValue) {
+            return response
         } else {
             await cache.set(`${request.eventName}-${number}`, true, global.timeout)
             global.options.body =
@@ -58,18 +65,28 @@ export const jobs = {
                 '&To=' +
                 number
 
-            await fetchWithRetry(global.baseURL, global.options, 'POST')
+            response = await fetchWithRetry(global.baseURL, global.options, 'POST')
         }
+        return response
     },
 }
 
-export async function onEvent(event, { jobs, global }) {
+async function onEvent(event, { jobs, global }) {
+    let response = null
     if (!global.eventAndNumberMap[event.event]) {
-        return
+        return null
     } else {
         const request = {
             eventName: event.event,
         }
-        await jobs.sendMessageWithTwilio(request).runNow()
+        response = await jobs.sendMessageWithTwilio(request).runNow()
     }
+
+    return response
+}
+
+module.exports = {
+    setupPlugin,
+    onEvent,
+    jobs,
 }
