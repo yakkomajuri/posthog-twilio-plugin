@@ -4,5 +4,5 @@
 
 This plugin will:
 
-- Trigger SMS on user specified events or actions.
-- You can set time out to avoid frequent messages being sent to the user
+-   Trigger SMS on user specified events or actions.
+-   You can set time out to avoid frequent messages being sent to the user
