@@ -31,8 +31,8 @@ async function setupPlugin({ config, global }) {
         })
         global.eventAndNumberMap[val[0]] = val[1]
     }
-    console.log(`Twillio setup successfully`)
-    return 'Twillio setup successfully'
+    console.log(`Twilio setup successfully`)
+    return 'Twilio setup successfully'
 }
 
 async function fetchWithRetry(url, options = {}, method = 'GET', isRetry = false) {

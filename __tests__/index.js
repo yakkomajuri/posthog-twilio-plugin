@@ -1,7 +1,7 @@
 const { createEvent } = require('@posthog/plugin-scaffold/test/utils.js')
 const { setupPlugin, add } = require('../index')
 
-test('test setting negative value for timeout in twillio', async () => {
+test('test setting negative value for timeout in Twilio', async () => {
     const response = await setupPlugin({
         config: {
             accountSID: 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -15,7 +15,7 @@ test('test setting negative value for timeout in twillio', async () => {
     expect(response).toEqual('timeout is not supported')
 })
 
-test('test setting greater value for timeout in twillio', async () => {
+test('test setting greater value for timeout in Twilio', async () => {
     const response = await setupPlugin({
         config: {
             accountSID: 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -29,7 +29,7 @@ test('test setting greater value for timeout in twillio', async () => {
     expect(response).toEqual('timeout is not supported')
 })
 
-test('test settings equal value for timeout in twillio', async () => {
+test('test settings equal value for timeout in Twilio', async () => {
     const response = await setupPlugin({
         config: {
             accountSID: 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -40,5 +40,5 @@ test('test settings equal value for timeout in twillio', async () => {
         },
         global: {},
     })
-    expect(response).toEqual('Twillio setup successfully')
+    expect(response).toEqual('Twilio setup successfully')
 })
