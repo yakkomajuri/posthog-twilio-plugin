@@ -19,7 +19,7 @@
 
 Follow [this](https://www.twilio.com/docs/usage/tutorials/how-to-use-your-free-trial-account#get-your-first-twilio-phone-number) official Documentation to your Twilio Phone Number.
 
-This plugin will:
+## This plugin will:
 
 + Trigger SMS on user specified events or actions.
 + You can set time out to avoid frequent messages being sent to the user
